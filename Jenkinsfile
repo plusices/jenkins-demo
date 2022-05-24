@@ -14,9 +14,7 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     command:
-    - sleep
-    args:
-    - 99999
+    - cat
     tty: true
     volumeMounts:
       - name: docker-secret
@@ -25,7 +23,7 @@ spec:
   volumes:
   - name: docker-secret
     secret:
-      secretName: regcred
+      secretName: jk-regcred
 '''
     }
 
