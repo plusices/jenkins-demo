@@ -40,6 +40,7 @@ spec:
     stage('image build and push') {
       steps {
         container(name: 'kaniko') {
+          sh 'ls /kaniko/.docker/'
           sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=weekendr01.azurecr.io/devops-demo:f17kl2 -v=debug'
         }
 
