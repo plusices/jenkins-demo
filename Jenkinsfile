@@ -39,7 +39,6 @@ spec:
       steps {
         container(name: 'kaniko') {
           sh 'ls /kaniko/.docker/'
-          sh 'sleep 300'
           sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=weekendr01.azurecr.io/devops-demo:f17kl2 -v=debug'
         }
 
