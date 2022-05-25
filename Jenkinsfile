@@ -1,4 +1,4 @@
-@Library("shared_lib")
+// @Library("shared_lib")
 def label = "slave-${UUID.randomUUID().toString()}"
 
 def helmLint(String chartDir) {
