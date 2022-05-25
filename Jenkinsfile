@@ -1,4 +1,4 @@
-@Library('github-api-global-lib')_
+@Library('jenkins-multibranch-pipeline-library-demo')_
 def label = "slave-${UUID.randomUUID().toString()}"
 
 def helmLint(String chartDir) {
