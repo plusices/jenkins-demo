@@ -39,7 +39,8 @@ podTemplate(label: label, containers: [
 
     stage('单元测试') {
       echo "测试阶段"
-      helloWorld(name:"test",dayOfWeek:"Wednesday")
+      sayHello 'Tux'
+      // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
     stage('代码编译打包') {
       try {
