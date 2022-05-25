@@ -1,4 +1,4 @@
-@Library('shared_lib')_
+@Library('github-api-global-lib')_
 def label = "slave-${UUID.randomUUID().toString()}"
 
 def helmLint(String chartDir) {
