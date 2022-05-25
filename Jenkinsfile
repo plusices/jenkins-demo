@@ -1,3 +1,4 @@
+@Library("shared_lib")
 def label = "slave-${UUID.randomUUID().toString()}"
 
 def helmLint(String chartDir) {
@@ -38,6 +39,7 @@ podTemplate(label: label, containers: [
 
     stage('单元测试') {
       echo "测试阶段"
+      helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
     stage('代码编译打包') {
       try {
