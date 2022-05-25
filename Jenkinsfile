@@ -37,7 +37,6 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
 
     stage('单元测试') {
-      
       echo "测试阶段"
     }
     stage('代码编译打包') {
