@@ -38,7 +38,9 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
 
     stage('单元测试') {
-      
+      dir('a-child-repo') {
+          git branch: 'master', url: 'git@github.com:plusices/devops-demo.git'
+      }
       // steps {
       //     sh 'find $P_PATH -name mytestfile'
       //     sh """
@@ -47,7 +49,6 @@ podTemplate(label: label, containers: [
       //     """
       // }
       sh """
-        cd ../
         find `pwd` -name mytestfile
       """
       // echo "测试阶段"
