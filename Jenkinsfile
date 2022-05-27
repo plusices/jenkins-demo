@@ -38,12 +38,24 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
 
     stage('单元测试') {
-      echo "测试阶段"
+      
+      // steps {
+      //     sh 'find $P_PATH -name mytestfile'
+      //     sh """
+      //       cd ../
+      //       find `pwd` -name mytestfile
+      //     """
+      // }
       sh """
-         export C_PATH=`pwd`
-         export P_PATH=`dirname $C_PATH`
-         find $P_PATH -name mytestfile
-      """ 
+        cd ../
+        find `pwd` -name mytestfile
+      """
+      // echo "测试阶段"
+      // sh """
+      //    export C_PATH=`pwd`
+      //    export P_PATH=`dirname $C_PATH`
+      //    find $P_PATH -name mytestfile
+      // """ 
       sayHello 'Tux'
       // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
