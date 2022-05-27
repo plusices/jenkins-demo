@@ -40,7 +40,9 @@ podTemplate(label: label, containers: [
     stage('单元测试') {
       echo "测试阶段"
       sh """
-         find $(dirname "$PWD") -name mytestfile
+         export C_PATH=`pwd`
+         export P_PATH=`dirname $C_PATH`
+         find $P_PATH -name mytestfile
       """ 
       sayHello 'Tux'
       // helloWorld(name:"test",dayOfWeek:"Wednesday")
