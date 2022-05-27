@@ -39,6 +39,9 @@ podTemplate(label: label, containers: [
 
     stage('单元测试') {
       echo "测试阶段"
+      sh """
+         find `pwd` -name mytestfile
+      """ 
       sayHello 'Tux'
       // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
