@@ -39,7 +39,8 @@ podTemplate(label: label, containers: [
 
     stage('单元测试') {
       dir('a-child-repo') {
-          git branch: 'master', url: 'git@github.com:plusices/devops-demo.git'
+        git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
+          // git branch: 'master', url: 'git@github.com:plusices/devops-demo.git'
       }
       // steps {
       //     sh 'find $P_PATH -name mytestfile'
