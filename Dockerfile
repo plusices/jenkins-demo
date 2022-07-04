@@ -3,8 +3,6 @@ WORKDIR /home
 
 # 修改alpine源为阿里云
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
-  apk add ca-certificates && update-ca-certificates && \
-  apk add --update tzdata && \
   rm -rf /var/cache/apk/*
 
 COPY demo-app /home/
