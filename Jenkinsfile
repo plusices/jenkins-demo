@@ -178,4 +178,3 @@ podTemplate(label: label, containers: [
     }
   }
 }
-
