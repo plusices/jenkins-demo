@@ -6,6 +6,11 @@ def helmLint(String chartDir) {
     sh "helm lint ${chartDir}"
 }
 
+def helmPackage(Map args) {
+
+
+}
+
 def helmDeploy(Map args) {
     if (args.debug) {
         println "Debug 应用"
@@ -38,7 +43,7 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
 
     stage('单元测试') {
-      dir('a-child-repo') {
+      dir('env_config') {
         git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
           // git branch: 'master', url: 'git@github.com:plusices/devops-demo.git'
       }
@@ -76,10 +81,11 @@ podTemplate(label: label, containers: [
       }
     }
     stage('构建 Docker 镜像') {
-      withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED')]) {
+      withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
           container('kaniko') {
             echo "3. 构建 Docker 镜像阶段"
             sh """
+              mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config
               cp ${REGCRED} /kaniko/.docker/config.json
               cat /kaniko/.docker/config.json
               /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${image} -v=debug
