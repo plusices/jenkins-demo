@@ -80,19 +80,20 @@ podTemplate(label: label, containers: [
         throw(exc)
       }
     }
-    stage('构建 Docker 镜像') {
-      withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-          container('kaniko') {
-            echo "3. 构建 Docker 镜像阶段"
-            sh """
-              mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config
-              cp ${REGCRED} /kaniko/.docker/config.json
-              cat /kaniko/.docker/config.json
-              /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${image} -v=debug
-              """
-          }
-      }
-    }
+    docker-build-push
+    // stage('构建 Docker 镜像') {
+    //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+    //       container('kaniko') {
+    //         echo "3. 构建 Docker 镜像阶段"
+    //         sh """
+    //           mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config
+    //           cp ${REGCRED} /kaniko/.docker/config.json
+    //           cat /kaniko/.docker/config.json
+    //           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${image} -v=debug
+    //           """
+    //       }
+    //   }
+    // }
     // stage('构建 Docker 镜像') {
     //   withCredentials([[$class: 'UsernamePasswordMultiBinding',
     //     credentialsId: 'docker-auth',
