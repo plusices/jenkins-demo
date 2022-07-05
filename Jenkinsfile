@@ -82,7 +82,7 @@ podTemplate(label: label, containers: [
         throw(exc)
       }
     }
-    dockerBuildPush(${image})
+    dockerBuildPush("${image}")
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
     //       container('kaniko') {
