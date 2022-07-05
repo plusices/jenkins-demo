@@ -27,9 +27,11 @@ podTemplate(label: label, containers: [
   containerTemplate(name: 'kaniko', image: 'gcr.io/kaniko-project/executor:debug', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'helm', image: 'cnych/helm', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'kubectl', image: 'cnych/kubectl', command: 'cat', ttyEnabled: true)
-], serviceAccount: 'jenkins', volumes: [
-  hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-]) 
+], serviceAccount: 'jenkins'
+// , volumes: [
+//   hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+// ]
+) 
 
 {
   node(label) {
