@@ -83,7 +83,12 @@ podTemplate(label: label, containers: [
       }
     }
     stage('构建 Docker 镜像') {
-      dockerBuildPush("${image}")
+      // dockerBuildPush("${image}")
+      dockerBuildPush(
+        regcred: 'regcred-uat',
+        image: "${image}",
+        kubeconfig: 'kubeconfig'
+      )
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
