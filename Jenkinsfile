@@ -11,16 +11,16 @@ def helmPackage(Map args) {
 
 }
 
-def helmDeploy(Map args) {
-    if (args.debug) {
-        println "Debug 应用"
-        sh "helm upgrade --dry-run --debug --install ${args.name} ${args.chartDir} -f ${args.valuePath} --set image.tag=${args.imageTag} --namespace ${args.namespace}"
-    } else {
-        println "部署应用"
-        sh "helm upgrade --install ${args.name} ${args.chartDir} -f ${args.valuePath} --set image.tag=${args.imageTag} --namespace ${args.namespace}"
-        echo "应用 ${args.name} 部署成功. 可以使用 helm status ${args.name} 查看应用状态"
-    }
-}
+// def helmDeploy(Map args) {
+//     if (args.debug) {
+//         println "Debug 应用"
+//         sh "helm upgrade --dry-run --debug --install ${args.name} ${args.chartDir} -f ${args.valuePath} --set image.tag=${args.imageTag} --namespace ${args.namespace}"
+//     } else {
+//         println "部署应用"
+//         sh "helm upgrade --install ${args.name} ${args.chartDir} -f ${args.valuePath} --set image.tag=${args.imageTag} --namespace ${args.namespace}"
+//         echo "应用 ${args.name} 部署成功. 可以使用 helm status ${args.name} 查看应用状态"
+//     }
+// }
 
 podTemplate(label: label, containers: [
   containerTemplate(name: 'golang', image: 'golang:1.14.2-alpine3.11', command: 'cat', ttyEnabled: true),
