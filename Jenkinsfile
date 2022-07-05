@@ -44,7 +44,7 @@ podTemplate(label: label, containers: [
     // 镜像
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
 
-    stage('单元测试') {
+    stage('下载variables') {
       dir('env_config') {
         git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
           // git branch: 'master', url: 'git@github.com:plusices/devops-demo.git'
@@ -57,7 +57,7 @@ podTemplate(label: label, containers: [
       //     """
       // }
       sh """
-        find `pwd` -name mytestfile
+        ls env_config
       """
       // echo "测试阶段"
       // sh """
@@ -66,6 +66,7 @@ podTemplate(label: label, containers: [
       //    find $P_PATH -name mytestfile
       // """ 
       sayHello 'Tux'
+      sh "cp *.yaml helm/templates/"
       // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
     stage('代码编译打包') {
@@ -89,6 +90,9 @@ podTemplate(label: label, containers: [
         image: "${image}",
         kubeconfig: 'kubeconfig'
       )
+    }
+    stage('helm打包'){
+
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
