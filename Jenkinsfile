@@ -82,19 +82,20 @@ podTemplate(label: label, containers: [
       )
     }
     stage('helm打包'){
-      when {
-        branch 'master'
-        // anyOf {
-        //     environment name: 'DEPLOY_TO', value: 'production'
-        //     environment name: 'DEPLOY_TO', value: 'staging'
-        // }
-      }
-      steps {
+      // when {
+      //   branch 'master'
+      //   // anyOf {
+      //   //     environment name: 'DEPLOY_TO', value: 'production'
+      //   //     environment name: 'DEPLOY_TO', value: 'staging'
+      //   // }
+      // }
+      if (env.BRANCH_NAME ==~ /(dev|master)/) {
         helmPackage(
           regcred: 'agile168',
           registryUrl: "${registryUrl}"
         )
       }
+      
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
