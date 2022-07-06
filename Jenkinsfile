@@ -89,10 +89,12 @@ podTemplate(label: label, containers: [
         //     environment name: 'DEPLOY_TO', value: 'staging'
         // }
       }
-      helmPackage(
-        regcred: 'agile168',
-        registryUrl: "${registryUrl}"
-      )
+      steps {
+        helmPackage(
+          regcred: 'agile168',
+          registryUrl: "${registryUrl}"
+        )
+      }
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
