@@ -6,24 +6,7 @@ def helmLint(String chartDir) {
     sh "helm lint ${chartDir}"
 }
 
-def helmPackage(Map args) {
-  
-  withCredentials([[$class: 'UsernamePasswordMultiBinding',
-        credentialsId: 'agile168',
-        usernameVariable: 'REGISTRY_USER',
-        passwordVariable: 'REGISTRY_PASSWORD']]) {
-    container('helm') {
-    echo "3. 构建 Docker 镜像阶段"
-    sh """
-      export HELM_EXPERIMENTAL_OCI=1
-      cd helm
-      helm package .
-      helm registry login ${args.registryUrl} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}
-      helm push jenkins-demo-0.1.0.tgz oci://${args.registryUrl}/helm
-    """
-    }
-  }
-}
+
 
 // def helmDeploy(Map args) {
 //     if (args.debug) {
@@ -73,15 +56,8 @@ podTemplate(label: label, containers: [
       sh """
         ls env_config
       """
-      // echo "测试阶段"
-      // sh """
-      //    export C_PATH=`pwd`
-      //    export P_PATH=`dirname $C_PATH`
-      //    find $P_PATH -name mytestfile
-      // """ 
       sayHello 'Tux'
       sh "cp env_config/*.yaml helm/templates/"
-      // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
     stage('代码编译打包') {
       try {
@@ -106,11 +82,17 @@ podTemplate(label: label, containers: [
       )
     }
     stage('helm打包'){
+      when {
+        branch 'master'
+        // anyOf {
+        //     environment name: 'DEPLOY_TO', value: 'production'
+        //     environment name: 'DEPLOY_TO', value: 'staging'
+        // }
+      }
       helmPackage(
-        // regcred: 'regcred-uat',
+        regcred: 'agile168',
         registryUrl: "${registryUrl}"
       )
-
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
