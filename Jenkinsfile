@@ -89,7 +89,8 @@ podTemplate(label: label, containers: [
       //   //     environment name: 'DEPLOY_TO', value: 'staging'
       //   // }
       // }
-      if (env.BRANCH_NAME ==~ /(dev|master)/) {
+      if (env.BRANCH_NAME ==~ /(dev)/) {
+        echo "${env.BRANCH_NAME}"
         helmPackage(
           regcred: 'agile168',
           registryUrl: "${registryUrl}"
