@@ -7,7 +7,7 @@ def helmLint(String chartDir) {
 }
 
 def helmPackage(Map args) {
-  sh "helm package ."
+  
   withCredentials([[$class: 'UsernamePasswordMultiBinding',
         credentialsId: 'agile168',
         usernameVariable: 'REGISTRY_USER',
@@ -15,6 +15,7 @@ def helmPackage(Map args) {
     container('helm') {
     echo "3. 构建 Docker 镜像阶段"
     sh """
+      helm package .
       helm registry login ${args.registryUrl} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}
       helm push jenkins-demo-0.1.0.tgz oci://${args.registryUrl}/helm
     """
