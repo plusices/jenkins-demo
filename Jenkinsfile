@@ -15,6 +15,7 @@ def helmPackage(Map args) {
     container('helm') {
     echo "3. 构建 Docker 镜像阶段"
     sh """
+      export HELM_EXPERIMENTAL_OCI=1
       cd helm
       helm package .
       helm registry login ${args.registryUrl} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}
