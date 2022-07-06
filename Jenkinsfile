@@ -159,7 +159,8 @@ podTemplate(label: label, containers: [
               chartDir    : "./helm",
               namespace   : "kube-ops",
               valuePath   : "./helm/my-values.yaml",
-              imageTag    : "${imageTag}"
+              imageTag    : "${imageTag}",
+              image       : "${registryUrl}/${imageEndpoint}"
           )
         }
       }
