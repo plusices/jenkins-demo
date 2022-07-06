@@ -7,8 +7,19 @@ def helmLint(String chartDir) {
 }
 
 def helmPackage(Map args) {
-
-
+  sh "helm package ."
+  withCredentials([[$class: 'UsernamePasswordMultiBinding',
+        credentialsId: 'agile168',
+        usernameVariable: 'REGISTRY_USER',
+        passwordVariable: 'REGISTRY_PASSWORD']]) {
+    container('helm') {
+    echo "3. 构建 Docker 镜像阶段"
+    sh """
+      helm registry login ${args.registryUrl} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}
+      helm push jenkins-demo-0.1.0.tgz oci://${args.registryUrl}/helm
+    """
+    }
+  }
 }
 
 // def helmDeploy(Map args) {
@@ -66,7 +77,7 @@ podTemplate(label: label, containers: [
       //    find $P_PATH -name mytestfile
       // """ 
       sayHello 'Tux'
-      sh "cp *.yaml helm/templates/"
+      sh "cp env_config/*.yaml helm/templates/"
       // helloWorld(name:"test",dayOfWeek:"Wednesday")
     }
     stage('代码编译打包') {
@@ -92,6 +103,10 @@ podTemplate(label: label, containers: [
       )
     }
     stage('helm打包'){
+      helmPackage(
+        // regcred: 'regcred-uat',
+        registryUrl: "${registryUrl}"
+      )
 
     }
     // stage('构建 Docker 镜像') {
