@@ -40,6 +40,8 @@ podTemplate(label: label, containers: [
     def imageEndpoint = "devops-demo"
     // 镜像
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
+    def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
+
 
     stage('下载variables') {
       dir('env_config') {
@@ -92,7 +94,6 @@ podTemplate(label: label, containers: [
       echo "${env.BRANCH_NAME}"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
-        def CURRENT_VERSION=sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()
         // sh "printenv"
         echo "${CURRENT_VERSION}"
         sh "printenv"
