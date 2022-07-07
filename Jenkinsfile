@@ -97,7 +97,8 @@ podTemplate(label: label, containers: [
         sh "printenv"
         if (!tag){
           echo "${tag}为空！"
-          def BRANCH_VERSION=sh(script:"echo ${BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
+          def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
+          echo "BRANCH_VERSION为${BRANCH_VERSION}"
           def CURRENT_VERSION=BRANCH_VERSION+${env.BUILD_NUMBER}
           echo "${CURRENT_VERSION}"
           sh "git tag \"v\"${CURRENT_VERSION} && git push origin --tags"
