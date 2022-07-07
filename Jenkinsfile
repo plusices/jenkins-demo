@@ -92,12 +92,12 @@ podTemplate(label: label, containers: [
       echo "${env.BRANCH_NAME}"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
-        def tag="${sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()}"
+        def tag=sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()
         // sh "printenv"
         sh "printenv"
         if (!tag){
           echo "${tag}为空！"
-          def BRANCH_VERSION="${sh(script:'echo \"${env.BRANCH_NAME}\" | cut -d / -f2', returnStdout: true).trim()}"
+          def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
           def CURRENT_VERSION=BRANCH_VERSION+${env.BUILD_NUMBER}
           echo "${CURRENT_VERSION}"
           sh "git tag \"v\"${CURRENT_VERSION} && git push origin --tags"
