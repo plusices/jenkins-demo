@@ -94,6 +94,7 @@ podTemplate(label: label, containers: [
         echo '正则匹配成功'
         def CURRENT_VERSION=sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()
         // sh "printenv"
+        echo "${CURRENT_VERSION}"
         sh "printenv"
         if (!CURRENT_VERSION){
           echo "${CURRENT_VERSION}为空！"
