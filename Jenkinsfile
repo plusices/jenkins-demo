@@ -89,7 +89,8 @@ podTemplate(label: label, containers: [
       //   //     environment name: 'DEPLOY_TO', value: 'staging'
       //   // }
       // }
-      if (env.BRANCH_NAME ==~ /(dev)/) {
+      if (env.BRANCH_NAME ==~ /(master|release)/) {
+
         echo "${env.BRANCH_NAME}"
         helmPackage(
           regcred: 'agile168',
@@ -153,7 +154,8 @@ podTemplate(label: label, containers: [
           } else {
               // deploy prod stuff
           }
-          helmDeploy(
+          if (env.BRANCH_NAME ==~ /develop/) {
+            helmDeploy(
               debug       : false,
               name        : "devops-demo",
               chartDir    : "./helm",
@@ -161,8 +163,11 @@ podTemplate(label: label, containers: [
               valuePath   : "./helm/my-values.yaml",
               imageTag    : "${imageTag}",
               image       : "${registryUrl}/${imageEndpoint}"
-          )
+            )
+          }
         }
+
+          
       }
     }
     stage('运行 Kubectl') {
