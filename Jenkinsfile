@@ -198,15 +198,8 @@ podTemplate(label: label, containers: [
             sh "helm rollback devops-demo --namespace kube-ops"
           }
         }
-
       }
     }
-
   }
-  environment {
-    DATED_GIT_HASH = "${new SimpleDateFormat("yyMMddHHmmss").format(new Date())}${GIT_COMMIT.take(6)}"
-    HELM_VERSION = "${BUILD_NUMBER}"
-  }
-
 }
 
