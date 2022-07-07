@@ -40,7 +40,7 @@ podTemplate(label: label, containers: [
     def imageEndpoint = "devops-demo"
     // 镜像
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
-    def CURRENT_VERSION=sh(script:"git describe --tags --abbrev=0", returnStdout: true).trim()
+    def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
 
 
     stage('下载variables') {
