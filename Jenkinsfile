@@ -91,7 +91,27 @@ podTemplate(label: label, containers: [
       // }
       echo "${env.BRANCH_NAME}"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
+        printenv
         echo '正则匹配成功'
+        def tag="${sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()}"
+        sh "printenv"
+        if (!tag){
+          echo "${tag}为空！"
+          // PREVIOUS_VERSION=$(git describe --tags --match "v$(Build.SourceBranchName)*" --abbrev=0) && PREVIOUS_VERSION=${PREVIOUS_VERSION:1}
+          // PREVIOUS_MAJOR=$(echo ${PREVIOUS_VERSION} | cut -d . -f1)
+          // PREVIOUS_MINOR=$(echo ${PREVIOUS_VERSION} | cut -d . -f2)
+          // PREVIOUS_PATCH=$(echo ${PREVIOUS_VERSION} | cut -d . -f3)
+          // CURRENT_PATCH=$((PREVIOUS_PATCH+1))
+          // CURRENT_VERSION=${PREVIOUS_MAJOR}"."${PREVIOUS_MINOR}"."${CURRENT_PATCH}
+          // [ -z "${PREVIOUS_VERSION}" ] && CURRENT_VERSION="$(Build.SourceBranchName).0"
+          // echo "previous version = ${PREVIOUS_VERSION}"
+          // echo "current version = ${CURRENT_VERSION}"
+          // git tag "v"${CURRENT_VERSION} && git push origin --tags
+          // PROJECT_VERSION=${CURRENT_VERSION}
+        }else{
+          echo "${tag}不为空！"
+        }
+        
         helmPackage(
           regcred: 'agile168',
           registryUrl: "${registryUrl}"
