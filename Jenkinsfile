@@ -94,7 +94,8 @@ podTemplate(label: label, containers: [
         printenv
         echo '正则匹配成功'
         def tag="${sh(script:'git tag \"v*\" --points-at HEAD', returnStdout: true).trim()}"
-        sh "printenv"
+        // sh "printenv"
+        sh('printenv')
         if (!tag){
           echo "${tag}为空！"
           // PREVIOUS_VERSION=$(git describe --tags --match "v$(Build.SourceBranchName)*" --abbrev=0) && PREVIOUS_VERSION=${PREVIOUS_VERSION:1}
