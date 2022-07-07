@@ -166,8 +166,6 @@ podTemplate(label: label, containers: [
             )
           }
         }
-
-          
       }
     }
     stage('运行 Kubectl') {
