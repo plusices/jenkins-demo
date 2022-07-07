@@ -90,7 +90,7 @@ podTemplate(label: label, containers: [
       //   // }
       // }
       echo "${env.BRANCH_NAME}"
-      if ((env.BRANCH =~ 'release.*').matches()) {
+      if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
         helmPackage(
           regcred: 'agile168',
