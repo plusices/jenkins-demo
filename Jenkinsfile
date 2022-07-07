@@ -90,7 +90,7 @@ podTemplate(label: label, containers: [
       //   // }
       // }
       if (env.BRANCH_NAME ==~ /(master|release)/) {
-
+        
         echo "${env.BRANCH_NAME}"
         helmPackage(
           regcred: 'agile168',
