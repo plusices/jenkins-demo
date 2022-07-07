@@ -97,7 +97,7 @@ podTemplate(label: label, containers: [
         sh "printenv"
         if (!CURRENT_VERSION){
           echo "${CURRENT_VERSION}为空！"
-          exit
+          return
           // def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
           // echo "BRANCH_VERSION为${BRANCH_VERSION}"
           // def CURRENT_VERSION="${BRANCH_VERSION}.${env.BUILD_NUMBER}"
@@ -114,7 +114,7 @@ podTemplate(label: label, containers: [
             )
           }else{
             echo "tag不在${BRANCH_VERSION}分支包含的版本里面！"
-            exit
+            return
           }
         }
         
