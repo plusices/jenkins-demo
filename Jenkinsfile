@@ -97,33 +97,28 @@ podTemplate(label: label, containers: [
         sh "printenv"
         if (!tag){
           echo "${tag}为空！"
-          def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
-          echo "BRANCH_VERSION为${BRANCH_VERSION}"
-          def CURRENT_VERSION="${BRANCH_VERSION}.${env.BUILD_NUMBER}"
-          echo "${CURRENT_VERSION}"
-          sshagent(['github-ssh-key	']) {
-            sh "git tag \"v\"${CURRENT_VERSION} && git push origin --tags"
-          }
-          // PREVIOUS_VERSION=$(git describe --tags --match "v$(Build.SourceBranchName)*" --abbrev=0) && PREVIOUS_VERSION=${PREVIOUS_VERSION:1}
-          // PREVIOUS_MAJOR=$(echo ${PREVIOUS_VERSION} | cut -d . -f1)
-          // PREVIOUS_MINOR=$(echo ${PREVIOUS_VERSION} | cut -d . -f2)
-          // PREVIOUS_PATCH=$(echo ${PREVIOUS_VERSION} | cut -d . -f3)
-          // CURRENT_PATCH=$((PREVIOUS_PATCH+1))
-          // CURRENT_VERSION=${PREVIOUS_MAJOR}"."${PREVIOUS_MINOR}"."${CURRENT_PATCH}
-          // [ -z "${PREVIOUS_VERSION}" ] && CURRENT_VERSION="$(Build.SourceBranchName).0"
-          // echo "previous version = ${PREVIOUS_VERSION}"
-          // echo "current version = ${CURRENT_VERSION}"
-          // git tag "v"${CURRENT_VERSION} && git push origin --tags
-          // PROJECT_VERSION=${CURRENT_VERSION}
+          exit
+          // def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
+          // echo "BRANCH_VERSION为${BRANCH_VERSION}"
+          // def CURRENT_VERSION="${BRANCH_VERSION}.${env.BUILD_NUMBER}"
+          // echo "${CURRENT_VERSION}"
         }else{
           echo "${tag}不为空！"
-          exit
+          def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
+          def CURRENT_VERSION=sh(script:"echo ${tag#'v'}"， returnStdout: true).trim()
+          if ((${CURRENT_VERSION} =~ "${BRANCH_VERSION}.*").matches()){
+            sh "envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl "
+            helmPackage(
+              regcred: 'agile168',
+              registryUrl: "${registryUrl}"
+            )
+          }else{
+            echo "tag不在${BRANCH_VERSION}分支包含的版本里面！"
+            exit
+          }
         }
         
-        helmPackage(
-          regcred: 'agile168',
-          registryUrl: "${registryUrl}"
-        )
+        
       }
       
     }
