@@ -56,6 +56,7 @@ podTemplate(label: label, containers: [
       // }
       sh """
         ls env_config
+        envsubst --help
       """
       sayHello 'Tux'
       sh "cp env_config/*.yaml helm/templates/"
@@ -91,6 +92,7 @@ podTemplate(label: label, containers: [
       //   // }
       // }
       echo "${env.BRANCH_NAME}"
+      sh "envsubst --help"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
         // sh "printenv"
