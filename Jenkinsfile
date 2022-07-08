@@ -56,7 +56,6 @@ podTemplate(label: label, containers: [
       // }
       sh """
         ls env_config
-        envsubst --help
       """
       sayHello 'Tux'
       sh "cp env_config/*.yaml helm/templates/"
