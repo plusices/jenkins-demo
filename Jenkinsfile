@@ -20,6 +20,7 @@ def helmLint(String chartDir) {
 // }
 
 podTemplate(label: label, containers: [
+  containerTemplate(name: 'jnlp', image: 'ntops/jenkins-agent', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'golang', image: 'golang:1.14.2-alpine3.11', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'kaniko', image: 'gcr.io/kaniko-project/executor:debug', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'helm', image: 'ntops/helm', command: 'cat', ttyEnabled: true),
@@ -56,6 +57,7 @@ podTemplate(label: label, containers: [
       // }
       sh """
         ls env_config
+        envsubst --help
       """
       sayHello 'Tux'
       sh "cp env_config/*.yaml helm/templates/"
