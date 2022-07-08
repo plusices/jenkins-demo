@@ -109,11 +109,13 @@ podTemplate(label: label, containers: [
           // def CURRENT_VERSION=sh(script:"echo ${tag#'v'}"， returnStdout: true).trim()
           echo "BRANCH_VERSION为：${BRANCH_VERSION}"
           if (("${CURRENT_VERSION}" =~ "v${BRANCH_VERSION}.*").matches()){
-            sh "envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl "
-            helmPackage(
-              regcred: 'agile168',
-              registryUrl: "${registryUrl}"
-            )
+            container('helm') {
+              sh "envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl "
+              helmPackage(
+                regcred: 'agile168',
+                registryUrl: "${registryUrl}"
+              )
+            }
           }else{
             echo "tag不在${BRANCH_VERSION}分支包含的版本里面！"
             error('Aborting!')
