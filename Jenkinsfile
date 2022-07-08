@@ -108,7 +108,7 @@ podTemplate(label: label, containers: [
           def BRANCH_VERSION=sh(script:"echo ${env.BRANCH_NAME} | cut -d / -f2", returnStdout: true).trim()
           // def CURRENT_VERSION=sh(script:"echo ${tag#'v'}"， returnStdout: true).trim()
           echo "BRANCH_VERSION为：${BRANCH_VERSION}"
-          if ((${CURRENT_VERSION} =~ "v${BRANCH_VERSION}.*").matches()){
+          if (("${CURRENT_VERSION}" =~ "v${BRANCH_VERSION}.*").matches()){
             sh "envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl "
             helmPackage(
               regcred: 'agile168',
