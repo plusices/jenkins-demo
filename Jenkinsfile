@@ -43,6 +43,18 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
 
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+    }
+
     stage('下载variables') {
       dir('env_config') {
         git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
@@ -95,9 +107,8 @@ podTemplate(label: label, containers: [
       sh "envsubst --help"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
-        // sh "printenv"
         echo "${CURRENT_VERSION}"
-        sh "printenv"
+        // sh "printenv"
         if (!CURRENT_VERSION){
           echo "${CURRENT_VERSION}为空！"
           error('Aborting!')
@@ -188,6 +199,10 @@ podTemplate(label: label, containers: [
               // deploy prod stuff
           }
           if (env.BRANCH_NAME ==~ /develop/) {
+            sh """
+            export CHART_VERSION='0.0.0'
+            envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
+            """
             helmDeploy(
               debug       : false,
               name        : "devops-demo",
