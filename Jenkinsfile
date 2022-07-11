@@ -31,6 +31,13 @@ podTemplate(label: label, containers: [
 // ]
 ) 
 
+
+properties([
+      parameters([
+        string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
+      ])
+])
+
 {
   node(label) {
     def myRepo = checkout scm
@@ -43,11 +50,7 @@ podTemplate(label: label, containers: [
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
 
-    properties([
-      parameters([
-        string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
-      ])
-    ])
+    
 
     stage('下载variables') {
       dir('env_config') {
