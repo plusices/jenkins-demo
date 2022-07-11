@@ -137,8 +137,6 @@ podTemplate(label: label, containers: [
             error('Aborting!')
           }
         }
-        
-        
       }
       
     }
