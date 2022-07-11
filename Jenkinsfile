@@ -33,9 +33,9 @@ podTemplate(label: label, containers: [
 
 
 properties([
-      parameters([
-        string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
-      ])
+  parameters([
+    string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
+  ])
 ])
 
 {
@@ -135,7 +135,6 @@ properties([
             error('Aborting!')
           }
         }
-        
         
       }
       
