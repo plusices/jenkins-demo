@@ -19,6 +19,13 @@ def helmLint(String chartDir) {
 //     }
 // }
 
+
+properties([
+    parameters([
+      string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
+    ])
+])
+
 podTemplate(label: label, containers: [
   containerTemplate(name: 'jnlp', image: 'ntops/jenkins-agent',ttyEnabled: true),
   containerTemplate(name: 'golang', image: 'golang:1.14.2-alpine3.11', command: 'cat', ttyEnabled: true),
@@ -29,14 +36,8 @@ podTemplate(label: label, containers: [
 // , volumes: [
 //   hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
 // ]
-) 
+)
 
-
-properties([
-    parameters([
-      string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
-    ])
-])
 
 {
   node(label) {
