@@ -124,6 +124,7 @@ podTemplate(label: label, containers: [
             echo "CHART_VERSION为：${CHART_VERSION}"
             // export CHART_VERSION=`echo ${CURRENT_VERSION} | sed  s/v//`
             sh """
+            export CHART_VERSION=`echo ${CHART_VERSION}`
             envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
             cat helm/Chart.yaml
             """
