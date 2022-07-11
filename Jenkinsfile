@@ -106,7 +106,7 @@ podTemplate(label: label, containers: [
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
         echo "${CURRENT_VERSION}"
-        // sh "printenv"
+        sh "printenv"
         if (!CURRENT_VERSION){
           echo "${CURRENT_VERSION}为空！"
           error('Aborting!')
