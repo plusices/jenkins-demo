@@ -139,7 +139,6 @@ podTemplate(label: label, containers: [
           }
         }
       }
-      
     }
     // stage('构建 Docker 镜像') {
     //   withCredentials([file(credentialsId: 'regcred-uat', variable: 'REGCRED'),file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
