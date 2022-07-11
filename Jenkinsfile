@@ -120,14 +120,15 @@ podTemplate(label: label, containers: [
           // def CURRENT_VERSION=sh(script:"echo ${tag#'v'}"， returnStdout: true).trim()
           echo "BRANCH_VERSION为：${BRANCH_VERSION}"
           if (("${CURRENT_VERSION}" =~ "v${BRANCH_VERSION}.*").matches()){
-            // def CHART_VERSION=sh(script:"echo ${CURRENT_VERSION} | sed  s/v//", returnStdout: true).trim()
-            // echo "CHART_VERSION为：${CHART_VERSION}"
+            def CHART_VERSION=sh(script:"echo ${CURRENT_VERSION} | sed  s/v//", returnStdout: true).trim()
+            echo "CHART_VERSION为：${CHART_VERSION}"
             sh """
             export CHART_VERSION=`echo ${CURRENT_VERSION} | sed  s/v//`
             envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
             cat helm/Chart.yaml
             """
             helmPackage(
+              chartVersion: "${CURRENT_VERSION}",
               regcred: 'agile168',
               registryUrl: "${registryUrl}"
             )
