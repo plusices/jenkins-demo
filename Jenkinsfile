@@ -122,8 +122,8 @@ podTemplate(label: label, containers: [
           if (("${CURRENT_VERSION}" =~ "v${BRANCH_VERSION}.*").matches()){
             def CHART_VERSION=sh(script:"echo ${CURRENT_VERSION} | sed  s/v//", returnStdout: true).trim()
             echo "CHART_VERSION为：${CHART_VERSION}"
+            // export CHART_VERSION=`echo ${CURRENT_VERSION} | sed  s/v//`
             sh """
-            export CHART_VERSION=`echo ${CURRENT_VERSION} | sed  s/v//`
             envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
             cat helm/Chart.yaml
             """
