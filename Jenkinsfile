@@ -51,7 +51,6 @@ properties([
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
 
     
-
     stage('下载variables') {
       dir('env_config') {
         git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
