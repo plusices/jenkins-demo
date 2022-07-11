@@ -129,7 +129,7 @@ podTemplate(label: label, containers: [
             cat helm/Chart.yaml
             """
             helmPackage(
-              chartVersion: "${CURRENT_VERSION}",
+              chartVersion: "${CHART_VERSION}",
               regcred: 'agile168',
               registryUrl: "${registryUrl}"
             )
