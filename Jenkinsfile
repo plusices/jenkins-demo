@@ -33,9 +33,9 @@ podTemplate(label: label, containers: [
 
 
 properties([
-  parameters([
-    string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
-  ])
+    parameters([
+      string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
+    ])
 ])
 
 {
@@ -51,6 +51,7 @@ properties([
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
 
     
+
     stage('下载variables') {
       dir('env_config') {
         git branch: 'master',credentialsId: 'github-ssh-key',url: 'ssh://git@github.com/plusices/devops-demo.git'
@@ -134,6 +135,7 @@ properties([
             error('Aborting!')
           }
         }
+        
         
       }
       
