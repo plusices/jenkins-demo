@@ -22,14 +22,8 @@ def helmLint(String chartDir) {
 
 properties([
     parameters([
-      string(name:'APP_NAME',defaultValue: 'accounts-service',description:'应用名称 必须使用小写 需跟maven构建中一致'),
-      string(name:'PROJECT_NAMESPACE',defaultValue: 'basebiz',description:'部署项目集名称'),
-      string(name:'SERVICE_SRC_PATH',defaultValue: 'accounts-service-webapp',description:'war包路径'),
-      string(name:'PROGECT_GIT_PATH',defaultValue:'basebiz/accounts-service.git',description:'项目gitlabpath '),
-      string(name:'TAG_NAME',defaultValue: '',description:'tag 发布线上必须填写 格式v20210101(v+当前日期)'),
-      string(name:'PODCOUNT',defaultValue: '2',description:'部署pod数量'),
-      string(name:'HEALTH_CHECK_URI',defaultValue: '/api/actuator/health',description:'健康检测地址'),
-      choice(name: 'ENVIRONMENT', choices: ['Dev', 'Staging', 'Prod'],  description: 'Environment choice (Dev/Staging/Prod)')
+      string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
+      string(name: 'color', defaultValue: 'blue', description: 'The build\'s color')
     ])
 ])
 
@@ -57,9 +51,6 @@ podTemplate(label: label, containers: [
     // 镜像
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
-    def KUBECONFIG_CREDENTIAL_ID_DEV = 'hk-d-shared-k01'
-    def KUBECONFIG_CREDENTIAL_ID_STAGING = 'hk-u-shared-k01'
-    def KUBECONFIG_CREDENTIAL_ID_PROD = 'hk-preview-k01'
 
     
 
@@ -97,18 +88,11 @@ podTemplate(label: label, containers: [
     }
     stage('构建 Docker 镜像') {
       // dockerBuildPush("${image}")
-      if (env.BRANCH_NAME =~ '/develop/'){
-        dockerBuildPush(
-          regcred: 'regcred-uat',
-          image: "${image}"
-        )
-      }
-      if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
-        dockerBuildPush(
-          regcred: 'regcred-uat',
-          image: "${image}"
-        )
-      }
+      dockerBuildPush(
+        regcred: 'regcred-uat',
+        image: "${image}",
+        kubeconfig: 'kubeconfig'
+      )
     }
     stage('helm打包'){
       // when {
@@ -118,8 +102,8 @@ podTemplate(label: label, containers: [
       //   //     environment name: 'DEPLOY_TO', value: 'staging'
       //   // }
       // }
-
       echo "${env.BRANCH_NAME}"
+      sh "envsubst --help"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
         echo "${CURRENT_VERSION}"
@@ -219,7 +203,7 @@ podTemplate(label: label, containers: [
             """
             helmDeploy(
               debug       : false,
-              name        : "${APP_NAME}-${ENVIRONMENT}",
+              name        : "devops-demo",
               chartDir    : "./helm",
               namespace   : "kube-ops",
               valuePath   : "./helm/my-values.yaml",
@@ -228,38 +212,40 @@ podTemplate(label: label, containers: [
             )
           }
         }
+
+          
       }
     }
-    // stage('运行 Kubectl') {
-    //   withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-    //     container('kubectl') {
-    //       sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
-    //       echo "5.查看应用"
-    //       sh "kubectl get all -n kube-ops -l app=devops-demo"
-    //     }
-    //   }
-    // }
-    // stage('快速回滚?') {
-    //   withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-    //     container('helm') {
-    //       sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
-    //       def userInput = input(
-    //         id: 'userInput',
-    //         message: '是否需要快速回滚？',
-    //         parameters: [
-    //             [
-    //                 $class: 'ChoiceParameterDefinition',
-    //                 choices: "Y\nN",
-    //                 name: '回滚?'
-    //             ]
-    //         ]
-    //       )
-    //       if (userInput == "Y") {
-    //         sh "helm rollback devops-demo --namespace kube-ops"
-    //       }
-    //     }
-    //   }
-    // }
+    stage('运行 Kubectl') {
+      withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+        container('kubectl') {
+          sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
+          echo "5.查看应用"
+          sh "kubectl get all -n kube-ops -l app=devops-demo"
+        }
+      }
+    }
+    stage('快速回滚?') {
+      withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+        container('helm') {
+          sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
+          def userInput = input(
+            id: 'userInput',
+            message: '是否需要快速回滚？',
+            parameters: [
+                [
+                    $class: 'ChoiceParameterDefinition',
+                    choices: "Y\nN",
+                    name: '回滚?'
+                ]
+            ]
+          )
+          if (userInput == "Y") {
+            sh "helm rollback devops-demo --namespace kube-ops"
+          }
+        }
+      }
+    }
   }
 }
 

@@ -1,0 +1,113 @@
+pipeline {
+  agent {
+    node {
+      label 'maven'
+    }
+  }
+    options{
+      buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    parameters {
+        string(name:'APP_NAME',defaultValue: 'accounts-service',description:'应用名称 必须使用小写 需跟maven构建中一致')
+        string(name:'PROJECT_NAMESPACE',defaultValue: 'basebiz',description:'部署项目集名称')
+        string(name:'SERVICE_SRC_PATH',defaultValue: 'accounts-service-webapp',description:'war包路径')
+        string(name:'PROGECT_GIT_PATH',defaultValue:'basebiz/accounts-service.git',description:'项目gitlabpath ')
+        string(name:'TAG_NAME',defaultValue: '',description:'tag 发布线上必须填写 格式v20210101(v+当前日期)')
+        string(name:'PODCOUNT',defaultValue: '2',description:'部署pod数量')
+        string(name:'HEALTH_CHECK_URI',defaultValue: '/api/actuator/health',description:'健康检测地址')
+    }
+    environment {
+        //构建镜像
+        REGISTRY = 'hub.xxxx.cn'
+        DOCKERHUB_NAMESPACE = 'app'
+        DOCKER_CREDENTIAL_ID = 'dockerhub-account' //hub账号密钥
+        GITHUB_CREDENTIAL_ID = 'gitlab-account' //gitlab账号密钥
+        //环境部署凭证
+        KUBECONFIG_CREDENTIAL_ID_DEV = 'testing-kubeconfig'
+        KUBECONFIG_CREDENTIAL_ID_VIEW = 'xxxxaliyun-testing'
+        KUBECONFIG_CREDENTIAL_ID_PROD = 'xxx-prod'
+        DOWNLOAD_BASEDOMAIN = 'gitlab.xxxx.cn' //公共资源下载
+        COMMIT_ID= sh(  returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+
+    }
+ stages {
+        stage ('迁出代码') {
+            steps {
+                checkout(scm)
+            }
+        }
+        stage ('编译') {
+            steps {
+                container ('maven') {
+
+                    //***************************************
+                    //**************下载通用模版***************
+                    sh 'curl -o `pwd`/start.sh https://${DOWNLOAD_BASEDOMAIN}/base/basicevn/-/raw/master/shell/springboot-start.sh'
+                    sh 'curl -o `pwd`/settings.xml https://${DOWNLOAD_BASEDOMAIN}/base/basicevn/-/raw/master/setting.xml'
+                    sh 'curl -o `pwd`/Dockerfile https://${DOWNLOAD_BASEDOMAIN}/base/basicevn/-/raw/master/dockerfile/javaservice/dockerfile'
+                    //***************************************
+                    sh 'mkdir `pwd`/yaml'
+                    sh 'curl -o `pwd`/yaml/devops-java.yaml https://${DOWNLOAD_BASEDOMAIN}/base/basicevn/-/raw/master/yaml/java-service-v1.0.0.yaml'
+                    sh 'mvn -Dmaven.test.skip=true -gs `pwd`/settings.xml clean package -U -Denv.trackerror=true'
+                }
+            }
+        }
+
+        stage('构建并推送镜像'){
+           steps{
+                container ('maven') {
+                  sh 'docker build --build-arg SERVICE_SRC_PATH=$SERVICE_SRC_PATH \
+                     --build-arg GENERATE_PATH=generated-resources/appassembler/jsw/$APP_NAME \
+                     --build-arg RELEASE_NAME=$BRANCH_NAME-$BUILD_NUMBER \
+                     --build-arg APP_NAME=$APP_NAME \
+                     -f Dockerfile \
+                     -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$BRANCH_NAME-$TAG_NAME-$BUILD_NUMBER-$COMMIT_ID \
+                     --no-cache .'
+                  withCredentials([usernamePassword(passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_USERNAME' ,credentialsId : "$DOCKER_CREDENTIAL_ID" ,)]) {
+                        sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
+                        sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$BRANCH_NAME-$TAG_NAME-$BUILD_NUMBER-$COMMIT_ID'
+                  }
+                  sh 'docker tag  $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$BRANCH_NAME-$TAG_NAME-$BUILD_NUMBER-$COMMIT_ID $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:latest '
+                  sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:latest '
+                }
+           }
+        }
+         stage("gitlab 打 tag"){
+          when{
+            expression{
+              return params.TAG_NAME =~ /v.*/
+            }
+          }
+         steps {
+                withCredentials([usernamePassword(credentialsId: "$GITHUB_CREDENTIAL_ID", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                       sh 'git config --global user.email "xxxx@xxxx.cn" '
+                                       sh 'git config --global user.name "xxxx" '
+                                       sh 'git tag -a $TAG_NAME-$BUILD_NUMBER -m "$TAG_NAME" '
+                                       sh 'git push https://$GIT_USERNAME:$GIT_PASSWORD@$DOWNLOAD_BASEDOMAIN/$PROGECT_GIT_PATH --tags --ipv4'
+                                     }
+                }
+         }
+
+        stage('部署测试环境') {
+         // when{
+         //   branch 'master'
+         // }
+          steps {
+            //input(id: 'deploy-to-dev', message: 'deploy to dev?')
+            kubernetesDeploy(configs: 'yaml/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID_DEV")
+          }
+        }
+
+        stage('部署生产环境') {
+          when{
+            expression{
+              return params.TAG_NAME =~ /v.*/
+            }
+          }
+          steps {
+            input(id: 'deploy-to-prod', message: '是否允许发布生产?')
+            kubernetesDeploy(configs: 'yaml/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID_PROD")
+          }
+        }
+    }
+}
