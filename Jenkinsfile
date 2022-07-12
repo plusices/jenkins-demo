@@ -22,13 +22,13 @@ def helmLint(String chartDir) {
 
 properties([
     parameters([
-      string(name:'APP_NAME',defaultValue: 'accounts-service',description:'应用名称 必须使用小写 需跟maven构建中一致')
-      string(name:'PROJECT_NAMESPACE',defaultValue: 'basebiz',description:'部署项目集名称')
-      string(name:'SERVICE_SRC_PATH',defaultValue: 'accounts-service-webapp',description:'war包路径')
-      string(name:'PROGECT_GIT_PATH',defaultValue:'basebiz/accounts-service.git',description:'项目gitlabpath ')
-      string(name:'TAG_NAME',defaultValue: '',description:'tag 发布线上必须填写 格式v20210101(v+当前日期)')
-      string(name:'PODCOUNT',defaultValue: '2',description:'部署pod数量')
-      string(name:'HEALTH_CHECK_URI',defaultValue: '/api/actuator/health',description:'健康检测地址')
+      string(name:'APP_NAME',defaultValue: 'accounts-service',description:'应用名称 必须使用小写 需跟maven构建中一致'),
+      string(name:'PROJECT_NAMESPACE',defaultValue: 'basebiz',description:'部署项目集名称'),
+      string(name:'SERVICE_SRC_PATH',defaultValue: 'accounts-service-webapp',description:'war包路径'),
+      string(name:'PROGECT_GIT_PATH',defaultValue:'basebiz/accounts-service.git',description:'项目gitlabpath '),
+      string(name:'TAG_NAME',defaultValue: '',description:'tag 发布线上必须填写 格式v20210101(v+当前日期)'),
+      string(name:'PODCOUNT',defaultValue: '2',description:'部署pod数量'),
+      string(name:'HEALTH_CHECK_URI',defaultValue: '/api/actuator/health',description:'健康检测地址'),
       choice(name: 'ENVIRONMENT', choices: ['Dev', 'Staging', 'Prod'],  description: 'Environment choice (Dev/Staging/Prod)')
     ])
 ])
