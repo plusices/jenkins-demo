@@ -189,34 +189,34 @@ podTemplate(label: label, containers: [
     // }
     stage('运行 Helm') {
       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-        container('helm') {
-          sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
-          echo "4.开始 Helm 部署"
-          def userInput = input(
-            id: 'userInput',
-            message: '选择一个部署环境',
-            parameters: [
-                [
-                    $class: 'ChoiceParameterDefinition',
-                    choices: "Dev\nQA\nProd",
-                    name: 'Env'
-                ]
-            ]
-          )
-          echo "部署应用到 ${userInput} 环境"
-          // 选择不同环境下面的 values 文件
-          if (userInput == "Dev") {
-              // deploy dev stuff
-          } else if (userInput == "QA"){
-              // deploy qa stuff
-          } else {
-              // deploy prod stuff
-          }
-          if (env.BRANCH_NAME ==~ /develop/) {
-            sh """
-            export CHART_VERSION='0.0.0'
-            envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
-            """
+        sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
+        echo "4.开始 Helm 部署"
+        def userInput = input(
+          id: 'userInput',
+          message: '选择一个部署环境',
+          parameters: [
+              [
+                  $class: 'ChoiceParameterDefinition',
+                  choices: "Dev\nQA\nProd",
+                  name: 'Env'
+              ]
+          ]
+        )
+        echo "部署应用到 ${userInput} 环境"
+        // 选择不同环境下面的 values 文件
+        if (userInput == "Dev") {
+            // deploy dev stuff
+        } else if (userInput == "QA"){
+            // deploy qa stuff
+        } else {
+            // deploy prod stuff
+        }
+        if (env.BRANCH_NAME ==~ /develop/) {
+          sh """
+          export CHART_VERSION='0.0.0'
+          envsubst < helm/Chart.yaml.tpl > helm/Chart.yaml && rm -f helm/Chart.yaml.tpl
+          """
+          container('helm') {
             helmDeploy(
               debug       : false,
               name        : "${APP_NAME}-${ENVIRONMENT}",
@@ -228,6 +228,7 @@ podTemplate(label: label, containers: [
             )
           }
         }
+        
       }
     }
     // stage('运行 Kubectl') {
