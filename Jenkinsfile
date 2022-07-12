@@ -191,17 +191,17 @@ podTemplate(label: label, containers: [
       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
         sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
         echo "4.开始 Helm 部署"
-        def userInput = input(
-          id: 'userInput',
-          message: '选择一个部署环境',
-          parameters: [
-              [
-                  $class: 'ChoiceParameterDefinition',
-                  choices: "Dev\nQA\nProd",
-                  name: 'Env'
-              ]
-          ]
-        )
+        // def userInput = input(
+        //   id: 'userInput',
+        //   message: '选择一个部署环境',
+        //   parameters: [
+        //       [
+        //           $class: 'ChoiceParameterDefinition',
+        //           choices: "Dev\nQA\nProd",
+        //           name: 'Env'
+        //       ]
+        //   ]
+        // )
         echo "部署应用到 ${userInput} 环境"
         // 选择不同环境下面的 values 文件
         // if (userInput == "Dev") {
