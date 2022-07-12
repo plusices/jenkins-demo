@@ -8,7 +8,7 @@ metadata:
   name: ${APP_NAME}-${ENVIRONMENT}
   namespace: ${PROJECT_NAMESPACE}
 spec:
-  replicas: {{ int $PODCOUNT }}
+  replicas: {{ int ${PODCOUNT} }}
   selector:
     matchLabels:
       app: ${APP_NAME}-${ENVIRONMENT}

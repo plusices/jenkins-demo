@@ -204,13 +204,13 @@ podTemplate(label: label, containers: [
         )
         echo "部署应用到 ${userInput} 环境"
         // 选择不同环境下面的 values 文件
-        if (userInput == "Dev") {
-            // deploy dev stuff
-        } else if (userInput == "QA"){
-            // deploy qa stuff
-        } else {
-            // deploy prod stuff
-        }
+        // if (userInput == "Dev") {
+        //     // deploy dev stuff
+        // } else if (userInput == "QA"){
+        //     // deploy qa stuff
+        // } else {
+        //     // deploy prod stuff
+        // }
         if (env.BRANCH_NAME ==~ /develop/) {
           sh """
           export CHART_VERSION='0.0.0'
