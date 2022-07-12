@@ -1,23 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "devops-demo.fullname" . }}
   labels:
-    app: {{ include "devops-demo.name" . }}
-    chart: {{ include "devops-demo.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: ${APP_NAME}-${ENVIRONMENT}
+    component: ${PROJECT_NAMESPACE}-${APP_NAME}
+    tier: backend
+  name: ${APP_NAME}-${ENVIRONMENT}
+  namespace: ${PROJECT_NAMESPACE}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: ${PODCOUNT}
   selector:
     matchLabels:
-      app: {{ include "devops-demo.name" . }}
-      release: {{ .Release.Name }}
+      app: ${APP_NAME}-${ENVIRONMENT}
+      component: ${PROJECT_NAMESPACE}-${APP_NAME}
+      tier: backend
   template:
     metadata:
       labels:
-        app: {{ include "devops-demo.name" . }}
-        release: {{ .Release.Name }}
+        app: ${APP_NAME}-${ENVIRONMENT}
+        component: ${PROJECT_NAMESPACE}-${APP_NAME}
+        tier: backend
     spec:
       containers:
         - name: {{ .Chart.Name }}

@@ -57,6 +57,9 @@ podTemplate(label: label, containers: [
     // 镜像
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
     def CURRENT_VERSION=sh(script:"git tag 'v*' --points-at HEAD", returnStdout: true).trim()
+    def KUBECONFIG_CREDENTIAL_ID_DEV = 'hk-d-shared-k01'
+    def KUBECONFIG_CREDENTIAL_ID_STAGING = 'hk-u-shared-k01'
+    def KUBECONFIG_CREDENTIAL_ID_PROD = 'hk-preview-k01'
 
     
 
@@ -94,11 +97,18 @@ podTemplate(label: label, containers: [
     }
     stage('构建 Docker 镜像') {
       // dockerBuildPush("${image}")
-      dockerBuildPush(
-        regcred: 'regcred-uat',
-        image: "${image}",
-        kubeconfig: 'kubeconfig'
-      )
+      if (env.BRANCH_NAME =~ '/develop/'){
+        dockerBuildPush(
+          regcred: 'regcred-uat',
+          image: "${image}"
+        )
+      }
+      if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
+        dockerBuildPush(
+          regcred: 'regcred-uat',
+          image: "${image}"
+        )
+      }
     }
     stage('helm打包'){
       // when {
@@ -109,7 +119,6 @@ podTemplate(label: label, containers: [
       //   // }
       // }
       echo "${env.BRANCH_NAME}"
-      sh "envsubst --help"
       if ((env.BRANCH_NAME =~ 'release/.*').matches()) {
         echo '正则匹配成功'
         echo "${CURRENT_VERSION}"
@@ -209,7 +218,7 @@ podTemplate(label: label, containers: [
             """
             helmDeploy(
               debug       : false,
-              name        : "devops-demo",
+              name        : "${APP_NAME}-${ENVIRONMENT}",
               chartDir    : "./helm",
               namespace   : "kube-ops",
               valuePath   : "./helm/my-values.yaml",
@@ -222,36 +231,36 @@ podTemplate(label: label, containers: [
           
       }
     }
-    stage('运行 Kubectl') {
-      withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-        container('kubectl') {
-          sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
-          echo "5.查看应用"
-          sh "kubectl get all -n kube-ops -l app=devops-demo"
-        }
-      }
-    }
-    stage('快速回滚?') {
-      withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-        container('helm') {
-          sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
-          def userInput = input(
-            id: 'userInput',
-            message: '是否需要快速回滚？',
-            parameters: [
-                [
-                    $class: 'ChoiceParameterDefinition',
-                    choices: "Y\nN",
-                    name: '回滚?'
-                ]
-            ]
-          )
-          if (userInput == "Y") {
-            sh "helm rollback devops-demo --namespace kube-ops"
-          }
-        }
-      }
-    }
+    // stage('运行 Kubectl') {
+    //   withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+    //     container('kubectl') {
+    //       sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
+    //       echo "5.查看应用"
+    //       sh "kubectl get all -n kube-ops -l app=devops-demo"
+    //     }
+    //   }
+    // }
+    // stage('快速回滚?') {
+    //   withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+    //     container('helm') {
+    //       sh "mkdir -p ~/.kube && cp ${KUBECONFIG} ~/.kube/config"
+    //       def userInput = input(
+    //         id: 'userInput',
+    //         message: '是否需要快速回滚？',
+    //         parameters: [
+    //             [
+    //                 $class: 'ChoiceParameterDefinition',
+    //                 choices: "Y\nN",
+    //                 name: '回滚?'
+    //             ]
+    //         ]
+    //       )
+    //       if (userInput == "Y") {
+    //         sh "helm rollback devops-demo --namespace kube-ops"
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 
