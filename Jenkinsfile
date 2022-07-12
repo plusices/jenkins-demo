@@ -29,7 +29,7 @@ properties([
       string(name:'TAG_NAME',defaultValue: '',description:'tag 发布线上必须填写 格式v20210101(v+当前日期)'),
       string(name:'PODCOUNT',defaultValue: '2',description:'部署pod数量'),
       string(name:'HEALTH_CHECK_URI',defaultValue: '/api/actuator/health',description:'健康检测地址'),
-      choice(name: 'ENVIRONMENT', choices: ['Dev', 'Staging', 'Prod'],  description: 'Environment choice (Dev/Staging/Prod)')
+      choice(name: 'ENVIRONMENT', choices: ['dev', 'staging', 'prod'],  description: 'Environment choice (Dev/Staging/Prod)')
     ])
 ])
 
